@@ -6,15 +6,10 @@ public class DeleteTopicMsg extends Message {
 	// Implement objectvariables, constructor, get/set-methods, and toString method
 	
 	String topic;
-	MessageType type;
 	
-	public DeleteTopicMsg(String topic) {
-		this.type = MessageType.DELETETOPIC;
+	public DeleteTopicMsg(String user, String topic) {
+		super(MessageType.DELETETOPIC, user);
 		this.topic = topic;
-	}
-	
-	public MessageType getType() {
-		return type;
 	}
 	
 	public String getTopic() {
@@ -27,6 +22,7 @@ public class DeleteTopicMsg extends Message {
 	
 	@Override
 	public String toString() {
-		return "Message [type=" + type + ", topic=" + topic + "]";
+		return "Message [type=" + getType() + ", user=" + getUser()
+		+ ", topic=" + topic +  "]";
 	};
 }

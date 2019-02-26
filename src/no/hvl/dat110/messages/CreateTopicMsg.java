@@ -6,15 +6,10 @@ public class CreateTopicMsg extends Message {
 	// Implement objectvariables, constructor, get/set-methods, and toString method
 	
 	String topic;
-	MessageType type;
 	
-	public CreateTopicMsg(String topic) {
-		this.type = MessageType.CREATETOPIC;
+	public CreateTopicMsg(String user, String topic) {
+		super(MessageType.CREATETOPIC, user);
 		this.topic = topic;
-	}
-	
-	public MessageType getType() {
-		return type;
 	}
 	
 	public String getTopic() {
@@ -27,7 +22,8 @@ public class CreateTopicMsg extends Message {
 	
 	@Override
 	public String toString() {
-		return "Message [type=" + type + ", topic=" + topic + "]";
+		return "Message [type=" + getType() + ", user=" + getUser()
+		+ ", topic=" + topic +  "]";
 	};
 	
 	

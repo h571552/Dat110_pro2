@@ -5,16 +5,21 @@ public class PublishMsg extends Message {
 	// TODO: 
 	// Implement objectvariables, constructor, get/set-methods, and toString method
 	
+	String topic;
 	String message;
-	MessageType type;
 	
-	public PublishMsg(String message) {
-		this.type = MessageType.PUBLISH;
+	public PublishMsg(String user, String topic, String message) {
+		super(MessageType.PUBLISH, user);
+		this.topic = topic;
 		this.message = message;
 	}
 	
-	public MessageType getType() {
-		return type;
+	public String getTopic() {
+		return topic;
+	}
+	
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 	
 	public String getMessage() {
@@ -27,7 +32,8 @@ public class PublishMsg extends Message {
 	
 	@Override
 	public String toString() {
-		return "Message [type=" + type + ", topic=" + message + "]";
+		return "Message [type=" + getType() + ", user=" + getUser()
+		+ ", topic=" + topic + ", message=" + message + "]";
 	};
 	
 }
