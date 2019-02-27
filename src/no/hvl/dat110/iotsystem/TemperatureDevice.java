@@ -12,11 +12,26 @@ public class TemperatureDevice {
 		
 		// TODO - start
 		
+		Client client = new Client("Temperature Sensor", Common.BROKERHOST, Common.BROKERPORT);
+		client.connect();
+		
+		for(int i = 0; i < COUNT; i++) {
+			
+			try {
+				client.sleep(432);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			client.publish(Common.TEMPTOPIC, "" + sn.read());
+		}
+		
+		client.disconnect();
+		
 		// TODO - end
 		
 		System.out.println("Temperature device stopping ... ");
-		
-		throw new RuntimeException("not yet implemented");
 		
 	}
 }
