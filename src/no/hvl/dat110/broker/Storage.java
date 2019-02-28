@@ -2,20 +2,25 @@ package no.hvl.dat110.broker;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import no.hvl.dat110.common.Logger;
+import no.hvl.dat110.messages.Message;
 import no.hvl.dat110.messagetransport.Connection;
 
 public class Storage {
 
 	protected ConcurrentHashMap<String, Set<String>> subscriptions;
 	protected ConcurrentHashMap<String, ClientSession> clients;
+	
+	protected ConcurrentHashMap<String, Set<Message>> pendingMessages;
 
 	public Storage() {
 		subscriptions = new ConcurrentHashMap<String, Set<String>>();
 		clients = new ConcurrentHashMap<String, ClientSession>();
+		pendingMessages = new ConcurrentHashMap<String, Set<Message>>();
 	}
 
 	public Collection<ClientSession> getSessions() {
@@ -27,17 +32,36 @@ public class Storage {
 		return subscriptions.keySet();
 
 	}
+	
+	public boolean SessionExists(String user) {
+		
+		return clients.containsKey(user);
+	}
+	
+	public void bufferMessage(String user, Message message) {
+
+		pendingMessages.get(user).add(message);
+	}
 
 	public ClientSession getSession(String user) {
 
-		ClientSession session = clients.get(user);
-
-		return session;
+		return clients.get(user);
 	}
 
 	public Set<String> getSubscribers(String topic) {
 
 		return (subscriptions.get(topic));
+
+	}
+	
+	public Set<Message> getPendingMessages(String user) {
+
+		Set<Message> set = null;
+		
+		if(pendingMessages.containsKey(user))
+			set = pendingMessages.get(user);
+		
+		return set;
 
 	}
 
@@ -54,6 +78,16 @@ public class Storage {
 
 		clients.remove(user);
 		
+	}
+	
+	public void addPendingUser (String user) {
+
+		pendingMessages.put( user, new HashSet<Message>() );
+	}
+	
+	public void removePendingUser (String user) {
+
+		pendingMessages.remove(user);
 	}
 
 	public void createTopic(String topic) {

@@ -2,6 +2,7 @@ package no.hvl.dat110.broker;
 
 import java.util.Set;
 import java.util.Collection;
+import java.util.HashSet;
 
 import no.hvl.dat110.common.Logger;
 import no.hvl.dat110.common.Stopable;
@@ -83,13 +84,22 @@ public class Dispatcher extends Stopable {
 
 	// called from Broker after having established the underlying connection
 	public void onConnect(ConnectMsg msg, Connection connection) {
-
+		
 		String user = msg.getUser();
 
 		Logger.log("onConnect:" + msg.toString());
 
 		storage.addClientSession(user, connection);
+		
+		ClientSession session = storage.getSession(user);
+		Set<Message> pending = storage.getPendingMessages(user);
+		
+		if(pending != null)
+		for(Message m : pending) {
+			session.send(m);
+		}
 
+		storage.removePendingUser(user);
 	}
 
 	// called by dispatch upon receiving a disconnect message 
@@ -98,7 +108,8 @@ public class Dispatcher extends Stopable {
 		String user = msg.getUser();
 
 		Logger.log("onDisconnect:" + msg.toString());
-
+		
+		storage.addPendingUser(user);
 		storage.removeClientSession(user);
 
 	}
@@ -146,12 +157,16 @@ public class Dispatcher extends Stopable {
 
 		Logger.log("onPublish:" + msg.toString());
 
-		// TODO: publish the message to clients subscribed to the topic
+		// publish the message to clients subscribed to the topic
 		
-		Set<String> list = 	storage.getSubscribers(msg.getTopic());
+		Set<String> subs = 	storage.getSubscribers(msg.getTopic());
 		
-		for(String user : list) {
-			storage.getSession(user).send(msg);
+		for(String user : subs) {
+			
+			if(storage.SessionExists(user))
+				storage.getSession(user).send(msg);
+			else
+				storage.bufferMessage(user, msg);
 		}
 		
 	}
